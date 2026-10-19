@@ -1,0 +1,51 @@
+version: 1
+repo: kvnloo/codex-router
+id: codex-router
+kind: suite
+summary: Local provider/model routing surface serving Codex and additional harnesses while preserving local credentials and separating routed model catalogs from client-owned subscription agent bridges.
+
+architecture:
+  subsystems:
+    - id: router-core
+      name: Router core
+      kind: compute
+      summary: Owns local model/provider routing, configuration, request adaptation, and compatibility surfaces.
+      paths: [src/, config/, bin/]
+    - id: harness-bridges
+      name: Harness and client bridges
+      kind: integration
+      summary: Serves Codex, DeepSeek Harness, Gemini CLI, Cursor, Claude Code, OpenClaw, and other clients through explicit bridge contracts.
+      paths: [src/, v2_agent/, hooks/]
+      depends_on: [router-core]
+    - id: control-center
+      name: Control Center and tray
+      kind: presentation
+      summary: Presents provider setup, routing state, diagnostics, and local controls without exposing credentials to agents.
+      paths: [apps/, packaging/]
+      depends_on: [router-core]
+    - id: credential-boundary
+      name: Local credential boundary
+      kind: security
+      summary: Keeps provider credentials and subscription-client auth local while exposing only bounded metadata and prompt transport through supported bridges.
+      paths: [src/, install.sh, install.ps1, docs/]
+      depends_on: [router-core]
+    - id: verification
+      name: Router verification
+      kind: evidence
+      summary: Exercises routing, bridge, installer, and compatibility behavior through tests and scripted checks.
+      paths: [test/, scripts/, scripts-check.mjs]
+      depends_on: [router-core]
+
+  provides_interfaces: []
+  consumes_interfaces: []
+  produces_representations: []
+  consumes_representations: []
+
+  boundaries:
+    owns: [local provider/model routing, client bridge transport, credential-local setup, router diagnostics]
+    not_here: [frontier model execution ownership, subscription token exfiltration, canonical z0intelligence policy, Zer0 architecture authority]
+
+  evidence:
+    docs: [README.md, AGENTS.md, docs/]
+    tests: [test/, scripts/]
+    schemas: [config/]
